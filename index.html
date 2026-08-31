@@ -78,6 +78,24 @@
       font-family: inherit;
     }
 
+    /* Accessibility Utilities */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
     /* Navigation */
     .topbar {
       background: var(--surface);
@@ -286,6 +304,8 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--text-muted);
+      margin: 0;
+      display: block;
     }
 
     .input-card-body, .result-card-body { padding: 16px 18px; }
@@ -342,6 +362,8 @@
       border-radius: 4px;
       white-space: nowrap;
       flex-shrink: 0;
+      background: transparent;
+      border: none;
     }
 
     .clear-btn:hover { color: var(--danger); background: var(--danger-bg); }
@@ -401,6 +423,10 @@
       flex-direction: column;
       gap: 1px;
       transition: background 0.1s;
+      border: none;
+      width: 100%;
+      text-align: left;
+      background: transparent;
     }
 
     .dropdown-item:hover,
@@ -459,7 +485,8 @@
     }
 
     input[type="text"],
-    input[type="number"] {
+    input[type="number"],
+    input[type="search"] {
       width: 100%;
       padding: 7px 10px;
       background: var(--bg);
@@ -732,29 +759,29 @@
 </head>
 <body>
 
-<nav class="topbar">
+<header class="topbar">
   <div class="topbar-left">
     <div class="wordmark">Ontario <span>Top 6</span></div>
     <div class="topbar-divider"></div>
     <div class="avg-inline">
       <span class="avg-label">Avg</span>
-      <span id="live-avg">—</span>
+      <span id="live-avg" aria-live="polite">—</span>
     </div>
   </div>
   <div class="topbar-right">
     <label class="toggle-group">
       <input type="checkbox" id="early-admission-toggle" onchange="handleInputChange()">
-      <span class="toggle-switch"></span>
+      <span class="toggle-switch" aria-hidden="true"></span>
       <span>Early Offer (3U/3M)</span>
     </label>
     <button class="btn-sm" onclick="copyShareLink()">Share</button>
   </div>
-</nav>
+</header>
 
-<div class="main">
-  <div class="input-card">
+<main class="main">
+  <section class="input-card" aria-labelledby="input-heading">
     <div class="input-card-header">
-      <span class="card-label">Program & Grades</span>
+      <h2 id="input-heading" class="card-label">Program & Grades</h2>
     </div>
     <div class="input-card-body">
       <div id="selected-program-display" class="selected-program-display">
@@ -763,12 +790,13 @@
           <span id="selected-program-name"></span>
           <a id="selected-program-link" href="#" target="_blank" rel="noopener">View on OUInfo ↗</a>
         </div>
-        <span class="clear-btn" onclick="clearProgram()">✕ Clear</span>
+        <button class="clear-btn" onclick="clearProgram()" aria-label="Clear selected program">✕ Clear</button>
       </div>
 
       <div class="search-box" id="search-container">
+        <label for="program-search" class="sr-only">Search university or program</label>
         <input
-          type="text"
+          type="search"
           id="program-search"
           placeholder="Search university or program…"
           autocomplete="off"
@@ -776,35 +804,44 @@
           onfocus="showDropdown()"
           onkeydown="handleSearchKey(event)"
         >
-        <div id="dropdown-menu" class="dropdown-menu"></div>
+        <div id="dropdown-menu" class="dropdown-menu" role="listbox"></div>
       </div>
 
       <div id="custom-inputs" class="custom-inputs">
-        <input type="text" id="custom-name" placeholder="Program name" oninput="handleInputChange()">
-        <input type="number" id="custom-target" placeholder="Target %" min="0" max="100" oninput="handleInputChange()">
+        <div>
+          <label for="custom-name" class="sr-only">Program name</label>
+          <input type="text" id="custom-name" placeholder="Program name" oninput="handleInputChange()">
+        </div>
+        <div>
+          <label for="custom-target" class="sr-only">Target percentage</label>
+          <input type="number" id="custom-target" placeholder="Target %" min="0" max="100" oninput="handleInputChange()">
+        </div>
       </div>
 
-      <div class="table-head">
+      <div class="table-head" aria-hidden="true">
         <div class="th">Course code</div>
         <div class="th">Grade (%)</div>
         <div></div>
       </div>
 
-      <div id="course-list"></div>
+      <div id="course-list">
+        </div>
 
       <div class="btn-group">
         <button class="btn btn-secondary" onclick="addCourseRow()">+ Add Course</button>
         <button class="btn btn-submit" onclick="runAnalysis()">Run Analysis</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div id="error-banner" class="error-banner"></div>
+  <div id="error-banner" class="error-banner" role="alert" aria-live="assertive"></div>
 
-  <div class="results-section" id="results-panel">
+  <section class="results-section" id="results-panel" aria-labelledby="results-heading">
+    <h2 id="results-heading" class="sr-only">Analysis Results</h2>
+    
     <div class="scoreboard-card">
       <div class="scoreboard-header">
-        <span class="card-label">Top 6 Breakdown</span>
+        <h3 class="card-label">Top 6 Breakdown</h3>
         <div class="scoreboard-avg">
           <span class="scoreboard-avg-label">Average</span>
           <span class="scoreboard-avg-num" id="scoreboard-avg">—</span>
@@ -818,7 +855,7 @@
     <div class="bottom-grid">
       <div class="result-card">
         <div class="result-card-header">
-          <span class="card-label">Prerequisite Check</span>
+          <h3 class="card-label">Prerequisite Check</h3>
         </div>
         <div class="result-card-body">
           <div class="status-text" id="prereq-summary">Select a program and run analysis.</div>
@@ -829,7 +866,7 @@
 
       <div class="result-card">
         <div class="result-card-header">
-          <span class="card-label">Target Gap</span>
+          <h3 class="card-label">Target Gap</h3>
         </div>
         <div class="result-card-body">
           <div class="metric-value" id="gap-metric">—</div>
@@ -838,10 +875,10 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="footer">Created by Pratas Vaidya</div>
-</div>
+  <footer class="footer">Created by Pratas Vaidya</footer>
+</main>
 
 <script src="js/app.js" defer></script>
 
