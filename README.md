@@ -2,7 +2,7 @@
 
 A web application designed for Ontario high school students to calculate their Top 6 Grade 12 (4U/4M) university admission averages based on specific program prerequisites.
 
-[![Live Demo](https://outop6.vercel.app)
+[![Live Demo](https://outop6.vercel.app) or outop6.vercel.app
 
 ---
 
